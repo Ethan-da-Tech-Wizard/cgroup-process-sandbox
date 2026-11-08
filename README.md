@@ -1,3 +1,10 @@
+<!--
+Program: Linux cgroup v2 Resource Governance & Namespace Sandbox
+Programmer: Ethan Kilmer
+Last Modified: 11/08/2026
+Purpose: Execute commands inside hard memory caps and isolated Linux namespaces to prevent desktop freezes.
+-->
+
 # Linux cgroup v2 Resource Governance & Namespace Isolation Sandbox
 
 A production-grade Linux process isolation and resource governance harness. It combines **systemd cgroup v2**, **unprivileged user/PID/network namespaces (`unshare`)**, **PID 1 zombie reaping**, **OOM priority adjustment**, and **thermal hysteresis gating** to execute untrusted, heavy, or test workloads without risking host workstation lockups, desktop freezes, or process signal leakage.

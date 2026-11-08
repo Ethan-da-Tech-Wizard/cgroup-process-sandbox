@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+# Program: Linux cgroup v2 Resource Governance & Namespace Sandbox
+# Programmer: Ethan Kilmer
+# Last Modified: 11/08/2026
+# Purpose: Execute commands inside hard memory caps and isolated Linux namespaces to prevent desktop freezes.
+#
 # ==============================================================================
 # Linux cgroup v2 Resource Governance & Namespace Isolation Sandbox
 # ==============================================================================
@@ -33,20 +38,23 @@
 # ------------------------------------------------------------------------------
 # 1. Shell Safety Flags
 # ------------------------------------------------------------------------------
-# -e: Exit immediately if any command exits with a non-zero exit status.
-# -u: Treat unset variables and parameters as errors during expansion.
-# -o pipefail: Return the exit status of the last command in the pipeline that
-#              failed, preventing masked pipeline errors.
+# -e: Exit immediately if any command returns a non-zero exit code.
+# -u: Treat unset variables and parameters as errors during variable expansion.
+# -o pipefail: Pipeline return code is the value of the last (rightmost) command
+#              to exit with a non-zero status, preventing errors masked by pipes.
 set -euo pipefail
 
-# Require at least one argument representing the target executable to run.
-# Exits with status code 2 on invalid usage.
+# Argument count validation:
+# Ensure the caller supplied at least one command argument to execute.
+# If no argument is provided, emit usage syntax to stderr and exit with status 2.
 [ "$#" -ge 1 ] || { echo "usage: $0 <command...>" >&2; exit 2; }
 
 # ------------------------------------------------------------------------------
 # 2. Operating System Dispatch (macOS Compatibility)
 # ------------------------------------------------------------------------------
-# If running on macOS (Darwin), delegate to the Darwin Seatbelt sandbox runner.
+# Inspect kernel operating system name via 'uname -s'.
+# If running on macOS (Darwin kernel), delegate execution to the Darwin Seatbelt
+# runner script (ethan_mac_capped_run.py) located in the same directory.
 if [ "$(uname -s)" = "Darwin" ]; then
   exec python3 "$(cd "$(dirname "$0")" && pwd)/ethan_mac_capped_run.py" "$@"
 fi
@@ -81,12 +89,14 @@ inner='echo 500 > /proc/self/oom_score_adj 2>/dev/null || true; "$@"; exit $?'
 # ------------------------------------------------------------------------------
 # 4. Host Mode Escape Hatch vs. Namespace Sandboxing
 # ------------------------------------------------------------------------------
-# If ETHAN_HOST=1 is set in the environment, bypass the namespace sandbox.
-# This is necessary when workloads require direct access to host hardware
-# (e.g. local LLM servers needing CUDA GPU device nodes, Wayland display sockets,
-# or host network interfaces).
+# Evaluate ETHAN_HOST environment variable (default: 0).
+# When ETHAN_HOST=1 is explicitly supplied, skip the unshare namespace sandbox.
+# This mode is required for workloads needing host GPU device nodes (CUDA/DRI),
+# direct host networking, or local graphical display server sockets (Wayland/X11).
 if [ "${ETHAN_HOST:-0}" = "1" ]; then
+  # Notify user on stderr that host mode is active and namespace sandbox is bypassed
   echo "ethan_capped_run: ETHAN_HOST=1, running on the host without the namespace sandbox" >&2
+  # Initialize prefix array as empty so command runs directly in the current namespace
   prefix=()
 else
   # Loopback Interface Initialization:
@@ -99,8 +109,9 @@ else
   inner='ip link set lo up 2>/dev/null || true; '"$inner"
 
   # Validate that unprivileged user and PID namespaces are supported on this host.
-  # If namespaces are disabled or restricted by kernel sysctl (e.g. Debian/RHEL
-  # unprivileged_userns_clone=0), fail closed unless ETHAN_HOST=1 is specified.
+  # Runs a smoke test with unshare. If namespaces are disabled or restricted by
+  # kernel sysctl (e.g. Debian/RHEL unprivileged_userns_clone=0), fail closed
+  # with status code 3 unless ETHAN_HOST=1 is specified.
   unshare --user --map-root-user --pid --fork --net --mount-proc true 2>/dev/null || {
     echo "ethan_capped_run: namespace sandbox unavailable; refusing. Set ETHAN_HOST=1 to run on the host." >&2; exit 3; }
 
@@ -158,12 +169,19 @@ fi
 #   - Fail-open design: if nvidia-smi is missing, query times out, or the wait
 #     budget expires, proceed anyway rather than causing an unrecoverable hang.
 if [ "${ETHAN_THERMAL_WAIT:-120}" != "0" ] && command -v nvidia-smi >/dev/null 2>&1; then
+  # Track elapsed wait time in seconds
   twaited=0
+  # Enter thermal polling loop
   while :; do
+    # Query GPU temperature in Celsius, stripping all non-digits, with a 3-second timeout
     gt="$(timeout 3 nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader,nounits 2>/dev/null | head -n1 | tr -dc '0-9')"
+    # Break immediately if temperature is unknown or below configured gate (default 88°C)
     { [ -z "$gt" ] || [ "$gt" -lt "${ETHAN_THERMAL_GATE:-88}" ]; } && break
+    # Break if thermal wait budget (default 120s) has expired, logging fail-open warning
     [ "$twaited" -ge "${ETHAN_THERMAL_WAIT:-120}" ] && { echo "ethan_capped_run: GPU still ${gt} C after ${twaited}s, running anyway" >&2; break; }
+    # Print initial notification to stderr on the first wait iteration
     [ "$twaited" -eq 0 ] && echo "ethan_capped_run: GPU ${gt} C >= ${ETHAN_THERMAL_GATE:-88}, waiting for it to cool (ETHAN_THERMAL_WAIT=0 skips)" >&2
+    # Sleep 5 seconds between polls and increment elapsed wait counter
     sleep 5; twaited=$((twaited + 5))
   done
 fi
@@ -183,23 +201,40 @@ fi
 #     inherited by the command. When the command finishes or is killed, the
 #     Linux kernel automatically closes the file descriptor and releases the lock.
 if [ "${ETHAN_SLOTS:-2}" != "0" ]; then
+  # Determine primary runtime directory for slot lock files
   slot_dir="${ETHAN_SLOT_DIR:-${XDG_RUNTIME_DIR:-/tmp}/ethan-capped-slots}"
   mkdir -p "$slot_dir" 2>/dev/null || true
+  # Fallback to /tmp with user UID if primary slot directory is unwritable or unavailable
   if [ ! -d "$slot_dir" ] || [ ! -w "$slot_dir" ]; then
     slot_dir="/tmp/ethan-capped-slots-${UID:-$(id -u)}"
     mkdir -p "$slot_dir" 2>/dev/null || true
   fi
+  # Track elapsed time waiting for an open slot and lock acquisition status
   waited=0; got=0
+  # Polling loop for non-blocking file descriptor locking
   while :; do
+    # Iterate through slot indices 1..ETHAN_SLOTS
     for i in $(seq 1 "${ETHAN_SLOTS:-2}"); do
+      # Dynamically open file descriptor {slotfd} pointing to slot file
       if { exec {slotfd}>"$slot_dir/slot$i"; } 2>/dev/null; then
-        if flock -n "$slotfd" 2>/dev/null; then got=1; break 2; else exec {slotfd}>&-; fi
+        # Attempt non-blocking kernel advisory lock (-n)
+        if flock -n "$slotfd" 2>/dev/null; then
+          # Lock acquired successfully; break out of both loop levels
+          got=1; break 2;
+        else
+          # Lock failed (slot in use); close file descriptor and check next slot
+          exec {slotfd}>&-;
+        fi
       fi
     done
+    # Exit polling loop if slot wait budget (default 1800s) has been exceeded
     [ "$waited" -ge "${ETHAN_SLOT_WAIT:-1800}" ] && break
+    # Emit waiting notification to stderr on the first retry iteration
     [ "$waited" -eq 0 ] && echo "ethan_capped_run: all ${ETHAN_SLOTS:-2} run slots busy, waiting (limits heat); ETHAN_SLOTS=0 skips" >&2
+    # Sleep 5 seconds and increment elapsed counter
     sleep 5; waited=$((waited + 5))
   done
+  # If slot wait timed out without lock, notify user and proceed fail-open
   [ "$got" = "1" ] || echo "ethan_capped_run: waited ${waited}s for a slot, running anyway" >&2
 fi
 
@@ -243,6 +278,7 @@ fi
 #     memory pressure exceeds 40% over the configured evaluation window, acting
 #     proactively before thrashing causes lockups.
 if [ -S "${XDG_RUNTIME_DIR:-/run/user/${UID:-$(id -u)}}/bus" ]; then
+  # Execute via systemd-run in transient user scope with strict cgroup v2 parameters
   exec systemd-run --user --scope --quiet --collect \
     -p "MemoryMax=${ETHAN_CAP:-3G}" -p MemorySwapMax=0 -p "CPUQuota=${ETHAN_CPU:-400%}" \
     -p ManagedOOMMemoryPressure=kill -p ManagedOOMMemoryPressureLimit=40% \
