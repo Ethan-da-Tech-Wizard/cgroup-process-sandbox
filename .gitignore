@@ -1,3 +1,8 @@
+# Program: Linux cgroup v2 Resource Governance & Namespace Sandbox
+# Programmer: Ethan Kilmer
+# Last Modified: 11/08/2026
+# Purpose: Execute commands inside hard memory caps and isolated Linux namespaces to prevent desktop freezes.
+
 __pycache__/
 *.py[cod]
 *$py.class
