@@ -2,7 +2,6 @@
 # ==============================================================================
 # Program: ethan_memory_safety_setup.sh
 # Programmer: Ethan-da-Tech-Wizard
-# Course: CIS 156 / Advanced Systems
 # Last Modified: November 18, 2026
 # Purpose: Configure persistent host memory safety infrastructure on Linux,
 #          including managed swap space, kernel virtual memory sysctl tunables,

@@ -2,7 +2,6 @@
 # ==============================================================================
 # Program: ethan_capped_run.sh
 # Programmer: Ethan-da-Tech-Wizard
-# Course: CIS 156 / Advanced Systems
 # Last Modified: November 18, 2026
 # Purpose: Execute arbitrary command-line payloads inside hardened Linux cgroup v2
 #          resource caps and isolated rootless user/pid/network namespaces.
