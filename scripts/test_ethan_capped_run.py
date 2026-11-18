@@ -1,10 +1,16 @@
-"""
-Program: Linux cgroup v2 Resource Governance & Namespace Sandbox
-Programmer: Ethan Kilmer
-Last Modified: 11/08/2026
-Purpose: Execute commands inside hard memory caps and isolated Linux namespaces to prevent desktop freezes.
-"""
-
+# ==============================================================================
+# Program: test_ethan_capped_run.py
+# Programmer: Ethan-da-Tech-Wizard
+# Course: CIS 156 / Advanced Systems
+# Last Modified: November 18, 2026
+# Purpose: Comprehensive unit test suite verifying Linux cgroup v2 resource
+#          governance, namespace isolation, OOM killing, zombie process reaping,
+#          flock concurrency slot limits, and memory safety host setup.
+#          Inputs: Test assertions executing sandboxed subprocess commands.
+#          Outputs: Standard unittest results (assertions, pass/skip/fail counts).
+#          Design Rationale: Validates that sandbox boundary conditions and
+#                            process governance guarantees remain completely
+#                            robust and regression-free.
 # ==============================================================================
 # Automated Test Suite for Linux cgroup v2 & Namespace Sandbox
 # ==============================================================================
