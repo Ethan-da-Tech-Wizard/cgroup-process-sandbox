@@ -1,7 +1,6 @@
 # ==============================================================================
 # Program: test_ethan_capped_run.py
 # Programmer: Ethan-da-Tech-Wizard
-# Course: CIS 156 / Advanced Systems
 # Last Modified: November 18, 2026
 # Purpose: Comprehensive unit test suite verifying Linux cgroup v2 resource
 #          governance, namespace isolation, OOM killing, zombie process reaping,
