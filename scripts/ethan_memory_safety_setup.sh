@@ -1,9 +1,19 @@
 #!/usr/bin/env bash
-# Program: Linux cgroup v2 Resource Governance & Namespace Sandbox
-# Programmer: Ethan Kilmer
-# Last Modified: 11/08/2026
-# Purpose: Execute commands inside hard memory caps and isolated Linux namespaces to prevent desktop freezes.
-#
+# ==============================================================================
+# Program: ethan_memory_safety_setup.sh
+# Programmer: Ethan-da-Tech-Wizard
+# Course: CIS 156 / Advanced Systems
+# Last Modified: November 18, 2026
+# Purpose: Configure persistent host memory safety infrastructure on Linux,
+#          including managed swap space, kernel virtual memory sysctl tunables,
+#          and systemd-oomd proactive memory pressure monitoring.
+#          Inputs: Optional command-line flag '--check' for dry-run inspection;
+#                  requires root (UID 0) privileges for live modification mode.
+#          Outputs: Informative console logging of verification steps, file updates,
+#                   and systemd daemon management operations to stdout/stderr.
+#          Design Rationale: Establishes a predictable memory headroom cushion,
+#                            protects inode and dentry VFS caches, and terminates
+#                            runaway cgroup units before unrecoverable kernel freezes.
 # ==============================================================================
 # Linux Memory Safety & Host Stability Setup
 # ==============================================================================
