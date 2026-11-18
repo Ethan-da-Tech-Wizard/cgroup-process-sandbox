@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Program: Linux cgroup v2 Resource Governance & Namespace Sandbox
-# Programmer: Ethan Kilmer
-# Last Modified: 11/08/2026
-# Purpose: Execute commands inside hard memory caps and isolated Linux namespaces to prevent desktop freezes.
+# Program: cgroup-process-sandbox - ethan_capped_run.sh
+# Programmer: Ethan-da-Tech-Wizard (written with Claude, an AI assistant)
+# Last Modified: 2026-11-18
+# Purpose: Runs any command inside a systemd memory/CPU cap (cgroup v2) and a rootless Linux namespace sandbox so runaway programs cannot freeze the desktop.
 #
 # ==============================================================================
 # Linux cgroup v2 Resource Governance & Namespace Isolation Sandbox

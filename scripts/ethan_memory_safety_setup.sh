@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Program: Linux cgroup v2 Resource Governance & Namespace Sandbox
-# Programmer: Ethan Kilmer
-# Last Modified: 11/08/2026
-# Purpose: Execute commands inside hard memory caps and isolated Linux namespaces to prevent desktop freezes.
+# Program: cgroup-process-sandbox - ethan_memory_safety_setup.sh
+# Programmer: Ethan-da-Tech-Wizard (written with Claude, an AI assistant)
+# Last Modified: 2026-11-18
+# Purpose: One-time root setup that creates an 8 GiB swapfile and writes sysctl and systemd-oomd settings so memory pressure cannot freeze the host.
 #
 # ==============================================================================
 # Linux Memory Safety & Host Stability Setup
