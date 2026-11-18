@@ -1,8 +1,10 @@
+# Program: cgroup-process-sandbox - test_ethan_capped_run.py
+# Programmer: Ethan-da-Tech-Wizard (written with Claude, an AI assistant)
+# Last Modified: 2026-11-18
+# Purpose: Unit tests that check the sandbox runner and the memory setup script keep their promises (memory cap, namespaces, slots, dry-run).
 """
-Program: Linux cgroup v2 Resource Governance & Namespace Sandbox
-Programmer: Ethan Kilmer
-Last Modified: 11/08/2026
-Purpose: Execute commands inside hard memory caps and isolated Linux namespaces to prevent desktop freezes.
+Unit tests for ethan_capped_run.sh and ethan_memory_safety_setup.sh.
+Run on Linux with: cd scripts && python3 -B -m unittest test_ethan_capped_run
 """
 
 # ==============================================================================
