@@ -24,6 +24,8 @@
 #   8. Memory safety host setup script validation and dry-run preview contract.
 # ==============================================================================
 
+"""Tests for ethan_capped_run.sh and ethan_memory_safety_setup.sh (many are skipped where cgroups/namespaces are unavailable)."""
+
 import os
 import subprocess
 import sys
