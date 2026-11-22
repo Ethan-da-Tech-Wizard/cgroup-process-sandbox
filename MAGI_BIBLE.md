@@ -1,212 +1,122 @@
-# ==============================================================================
-# THE UNIVERSAL MAGI BIBLE: AI CODING FOUNDATIONS & VERIFIABLE ENGINEERING
-# ==============================================================================
-# PROGRAM:       docs/MAGI_BIBLE_AI_CODING_FOUNDATIONS.md
-# PROGRAMMER:    Ethan & Antigravity (TWU LLC / Magi Fleet)
-# LAST MODIFIED: 2026-11-21 17:25 MST, workstation-01
-# PURPOSE:       The definitive open-source guide for human engineers and autonomous
-#                AI agents (Magi) collaborating on sovereign, high-assurance software.
-#                Establishes Rule 16 commenting, PII-scrubbed screenshot standards,
-#                fail-closed security invariants, and verifiable testing foundations.
-#
-# CHANGE HISTORY:
-#   2026-11-21 17:25  Magi 6 (antigravity)  Initial public codification commissioned
-#                                           by Ethan to teach open-source communities
-#                                           and autonomous AI agents how to build
-#                                           trustworthy, well-documented software.
-# ==============================================================================
+# The Magi Bible: Open-Source AI Agent Engineering & Collaboration Standard 📖
 
-# The Universal Magi Bible: AI Coding Foundations & Engineering Standards
+> *"I have a passion for coding with the help of AI to solve problems and to create things for fun because I can. To make that work at scale, AI agents need solid engineering foundations, deep documentation, and rigorous boundaries."*  
+> — **Ethan (TWU LLC)**
 
-> *"We should put all that stuff on there so others can use it... Be sure to license it up and out! And comment the heck out of everything. It should be general so all people's Magi can know how to progress, teaching solid coding foundations and practices with AI."*
-> — **Ethan (Tech Wizards United LLC)**
+Welcome to the **Magi Engineering Standard**. This document outlines how human developers and autonomous AI coding agents collaborate to build resilient, local-first software. Whether you are running a swarm of AI subagents (Claude, Codex, Gemini, Antigravity) or writing code by hand, these practices ensure that systems remain transparent, secure, heavily documented, and fun to build.
 
 ---
 
-## 1. The Core Philosophy of Magi Engineering
-
-Autonomous artificial intelligence is transforming software engineering. However, without rigorous foundational discipline, AI-generated code easily degenerates into **"word spout"**—verbose, unverifiable implementations that shuffle files, fake security passes, and accumulate massive technical debt.
-
-The **Magi Engineering Standard** is built on five inviolable tenets:
+## 1. Core Engineering Tenets
 
 ```mermaid
 flowchart TD
-    A["Magi Engineering Core"] --> B["1. Rule 16: Hyper-Documentation"]
-    A --> C["2. Zero Word-Spout & Real Defenses"]
-    A --> D["3. Visual Proof & PII Scrubbing"]
-    A --> E["4. Fail-Closed Security Invariants"]
-    A --> F["5. 100% Deterministic Verification"]
+    A["Human Vision & AI Creativity"] --> B["Rule 16 Comment Discipline<br/>(>=25% Comments, Header, Docstrings)"]
+    B --> C["Standard Library First<br/>($0.00 Spend, Zero Pip/Npm Bloat)"]
+    C --> D["State Decoupling<br/>(Atomic JSON Receipts in data/health/)"]
+    D --> E["Adversarial Verification<br/>(Independent Reviewer Friction)"]
+    E --> F["Zero-PII / Secret Gate<br/>(Automated Export Audit)"]
+    F --> G["Visual Walkthroughs<br/>(Clean Screenshots & CLI Previews)"]
+    G --> H["Clean Public Release"]
 ```
-
-1. **AI as a Precision Tool, Not an Excuse for Sloppiness:** Every function must be documented so that a junior developer reading it for the first time understands the exact algorithm, inputs, outputs, and edge cases.
-2. **Deterministic Reproducibility:** Code must rely on the standard library whenever possible. Avoid bloated dependency graphs that introduce supply-chain vulnerabilities.
-3. **Visual Transparency:** People must see how tools look and work before running them. Every user-facing tool requires clear walkthrough screenshots and terminal mockups.
-4. **Zero-PII Public Boundaries:** Never expose private machine hostnames, real MAC addresses, local user directories, or private tokens in source code, commit history, or screenshots.
-5. **Fail-Closed Operations:** A security check that encounters a missing tool or broken scanner must report `HOLD` or `REVIEW`. It must **never** silently downgrade to `PASS`.
 
 ---
 
-## 2. Rule 16: The Perfectionist Commenting & Documentation Standard
+## 2. Rule 16: Code Craft, Commentary & Transparency
 
-Rule 16 is our mandatory coding and documentation law. All code produced by any Magi agent must achieve a **minimum of 25.0% comment density** (ideal target: 27%–35%) and satisfy the following four requirements:
+AI models can write hundreds of lines in seconds, but un-commented AI code quickly becomes legacy code that nobody understands or trusts. Every script in a Magi workspace adheres to **Rule 16**:
 
-### Requirement 1: The Mandatory 4-Line File Header
-
-Every script, library, and documentation file must begin with an immutable metadata block:
-
+### A. The Standard 4-Line Header
+Every source file begins with an explicit provenance header:
 ```python
-#!/usr/bin/env python3
 # ==============================================================================
-# TWU SOVEREIGN CLUSTER - [SUBSYSTEM NAME]
-# ==============================================================================
-# PROGRAM:       path/to/script_name.py
-# PROGRAMMER:    Ethan & [Agent / Contributor Name]
-# LAST MODIFIED: YYYY-MM-DD HH:MM Timezone, host_node
-# PURPOSE:       Clear, 2-3 sentence description of the file's primary responsibility,
-#                system layer, and operational invariants.
-#
-# CHANGE HISTORY:
-#   YYYY-MM-DD HH:MM  [Author / Seat]  Initial implementation conforming to Rule 16.
-#   YYYY-MM-DD HH:MM  [Author / Seat]  Added regression tests and memory caps.
+# PROGRAM:       scripts/example_scanner.py
+# PROGRAMMER:    Ethan & AI Agent Swarm (TWU LLC)
+# LAST MODIFIED: 2026-11-21, local environment
+# PURPOSE:       Audits socket perimeter to verify zero unauthorized public ports.
 # ==============================================================================
 ```
 
-### Requirement 2: Comprehensive Typed Docstrings
+### B. Comment Density Invariant ($\ge 25\% - 30\%$)
+* At least **1 in every 4 lines** must be a comment or docstring.
+* Comments must explain **intent, safety invariants, and step-by-step logic**, not just restate syntax:
+  ```python
+  # Good: Step 1: Enforce strict socket connection timeout to prevent hanging UI
+  s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+  s.settimeout(0.2)
 
-Every class and function must declare explicit type annotations and typed docstrings:
+  # Bad: Set socket
+  s = socket.socket()
+  ```
 
-```python
-def verify_hash_manifest(manifest_path: Path, target_dir: Path) -> Tuple[bool, List[str]]:
-    """Verify cryptographic SHA-256 hashes for all files listed in manifest.
-
-    Args:
-        manifest_path: Absolute path to the JSON manifest containing file hashes.
-        target_dir: Base directory containing target files to audit.
-
-    Returns:
-        Tuple[bool, List[str]]: A tuple where the first element indicates whether
-        all hashes matched, and the second contains mismatch failure messages.
-
-    Raises:
-        FileNotFoundError: If manifest_path or target_dir does not exist.
-        PermissionError: If files cannot be opened due to filesystem permissions.
-    """
-```
-
-### Requirement 3: Step-by-Step Algorithmic Comments
-
-Never leave complex logic unexplained. Break functions into sequential, numbered steps:
-
-```python
-    # Step 1: Validate file existence and permissions before reading
-    if not manifest_path.is_file():
-        raise FileNotFoundError(f"Missing manifest: {manifest_path}")
-
-    # Step 2: Stream manifest into memory with size limit to prevent memory exhaustion
-    manifest_data = json.loads(manifest_path.read_text(encoding="utf-8"))
-
-    # Step 3: Iterate through file entries and calculate streaming SHA-256 digests
-    mismatches = []
-    for rel_path, expected_hash in manifest_data.items():
-        file_path = target_dir / rel_path
-        
-        # Step 3a: Guard against path traversal escaping target_dir
-        if not file_path.resolve().is_relative_to(target_dir.resolve()):
-            mismatches.append(f"Illegal path traversal attempt: {rel_path}")
-            continue
-```
-
-### Requirement 4: Automated Verification of Rule 16
-
-Verify your code using our automated comment density checker:
-
-```bash
-python3 scripts/ethan_perfectionist_code_documentation.py path/to/script.py
-# Output: [PASS] path/to/script.py — comment ratio: 31.4% (Threshold: >=25.0%)
-```
+### C. Typed Docstrings
+Every public class and function must provide explicit parameter and return type specifications.
 
 ---
 
-## 3. Visual Proof & PII Scrubbing Standard for Screenshots
+## 3. Standard Library First ($0.00 Spend, Zero Bloat)
 
-Open-source users need to see and understand tools before running them on their hardware. However, visual media is the primary vector for accidental credential and identity leakage.
+Before installing a third-party package (`pip`, `npm`, `cargo`), evaluate if the Python standard library already provides what you need:
+* Need structured data? Use `json` and `dataclasses`.
+* Need network probing? Use `socket` and `urllib`.
+* Need concurrency? Use `concurrent.futures`.
+* Need AST validation? Use `ast` and `tokenize`.
+* Need process management? Use `subprocess` with explicit timeouts.
 
-### The PII Sanitization Invariant
-
-Before capturing or publishing any screenshot or terminal recording, enforce the **Scrubbing Sieve**:
-
-| Sensitive Category | Leaked Pattern (Prohibited) | Mandatory Public Replacement |
-|---|---|---|
-| **Local User Paths** | `<root-directory>/internal/repo` | `~/workspace/...` or `/workspace/project/...` |
-| **User Identifiers** | `developer@internal-box` | `developer@sovereign-node` |
-| **Real IP Addresses** | Internal private LAN IP | `127.0.0.1` or RFC 5737 (`192.0.2.1`) |
-| **Hardware MACs** | Real interface hardware hex | `de:ad:be:ef:00:01` (mock address) |
-| **Email Addresses** | Personal primary email | `user@example.com` or noreply address |
-| **API Tokens & Keys** | Live bearer or secret tokens | `TOKEN_************************************` |
-
-### Automated Screenshot Redaction Workflow
-
-```mermaid
-sequenceDiagram
-    participant Terminal as Raw CLI Output
-    participant Sanitizer as PII Regex Sieve
-    participant Renderer as Pillow / Convert Engine
-    participant GitHub as Public Repository Asset
-
-    Terminal->>Sanitizer: Pass raw text / ANSI buffer
-    Note over Sanitizer: Replace usernames, IPs, MACs, paths
-    Sanitizer->>Renderer: Scrubbed text stream
-    Note over Renderer: Render dark-mode terminal window with traffic lights
-    Renderer->>GitHub: Commit to docs/assets/walkthroughs/*.png
-```
+**The Invariant:** A developer who clones your repository should be able to run `python3 scripts/tool.py` immediately without wrestling with broken virtual environments, conflicting dependencies, or paid API keys.
 
 ---
 
-## 4. Real Defensive Engineering vs. "Word Spout"
+## 4. State Decoupling: Atomic JSON Receipts
 
-Do not write safety tools that only print friendly reassurance text. Modern sovereign systems require robust, reproducible open-source security tools:
-
-### 1. Detached Digital Signatures (`minisign` / `signify`)
-- Never trust an unverified download.
-- Verify Ed25519 signatures with detached 32-byte public keys before execution.
-
-### 2. Deep Content & Pattern Analysis (`YARA`)
-- Detect weaponized payloads, obfuscated bytecode, and malicious macros offline with compiled YARA rules.
-- Local execution with **$0.00 cloud token cost**.
-
-### 3. Namespace & Isolated Process Containment (`bubblewrap`)
-- Extract untrusted `.tar.gz`, `.zip`, and `.pkg` archives inside an unprivileged Bubblewrap namespace (`bwrap --unshare-all --net-none --ro-bind / /`).
-- Zero-day decompressor bugs cannot touch your home directory or mesh sockets.
-
-### 4. Non-Destructive Invariant Enforcement
-- Strip executable bits on all newly downloaded files immediately: `chmod 0600 "$FILE"`.
-- Never restore `+x` until cryptographic verification passes.
+Never tie backend diagnostic telemetry directly to a frontend process lifecycle:
+1. **Background Collection:** Backend tools (`chief_zero_ports_scanner.py`, `space_weather_telemetry.py`) collect system telemetry and atomically write structured JSON receipts to `data/health/<tool>.json`.
+2. **Asynchronous Presentation:** Terminal commands (`dash chief`) and web cockpits read these receipts asynchronously.
+3. **Migration Resilience:** If the UI is updated, redesigned, or moved to another host, zero telemetry data or state is lost.
 
 ---
 
-## 5. How to Collaborate in a Multi-Agent Swarm (Magi Swarm Rules)
+## 5. Adversarial Multi-Agent Friction
 
-When multiple AI agents work in parallel across diverse machines (Linux, macOS, BSD):
+> *"The best thing a second agent can do for the first one is disagree with it."*
 
-1. **Own Your Work:** Never assign tasks to peer seats. Claim an open task on the board (`magi_todo_board.py claim ID --seat N`), do the work, record evidence, and let a peer independently review and approve it.
-2. **Check Before Writing:** Run `ls scripts/<name>*` and query the board before creating any file to prevent name collisions.
-3. **Synchronize Without Divergence:** Rely on verified file locks (`fcntl`), atomic writes with `O_CREAT | O_EXCL`, and append-only receipt logs.
-4. **No Unneeded File Movement:** Do not shuffle 500MB archives between staging folders. Stream file descriptors with `O_RDONLY | O_NOFOLLOW`.
-5. **Clean Up Ephemeral Clones:** When finishing work on a project that does not belong to the host node, push all scrubbed commits, verify the receipt, and cleanly remove the temporary working clone.
-
----
-
-## 6. Checklist for Public Open-Source Release
-
-Before any repository or tool is published to GitHub:
-
-- [ ] **Scrubbed Audit:** Run `scripts/public_export_audit.py check <DIR>` -> Must return **`PASS (0 hits)`**.
-- [ ] **Open-Source License:** Include valid `LICENSE` (Apache-2.0 or MIT) and `NOTICE` with third-party attributions.
-- [ ] **Code of Conduct:** Include standard `CODE_OF_CONDUCT.md` and `CONTRIBUTING.md`.
-- [ ] **Visual Walkthrough:** Include at least one high-contrast, PII-scrubbed screenshot or terminal diagram in `docs/assets/`.
-- [ ] **Rule 16 Compliant:** All scripts have 4-line headers, `CHANGE HISTORY`, and $\ge 25\%$ comment density.
-- [ ] **Green CI Workflows:** Every `.github/workflows/ci.yml` is tested and verified green on multiple OS runners (Ubuntu Linux, macOS).
+Never allow an implementing agent to approve its own work. Separate execution into distinct roles:
+1. **Implementer:** Focuses on writing functional, clean code that solves the user's objective.
+2. **Adversarial Reviewer:** Scans code specifically looking for:
+   * Bare `except:` catch blocks that swallow debugging signals.
+   * `subprocess` calls lacking explicit `timeout=` parameters.
+   * `shell=True` command injection hazards.
+   * Missing docstrings or comment density below 25%.
+   * Accidental secret or hostname leakage.
 
 ---
 
-*(Distributed under Apache-2.0. Authored for the global developer and AI agent community.)*
+## 6. Zero PII & Zero Secret Leaks
+
+Before code or documentation is pushed to a public repository, it must pass an automated export audit:
+* **Private Names & Hostnames:** Internal computer hostnames, personal surnames, and local home directory paths must be scrubbed or replaced with generic placeholders (`workstation-01`, `example_node`).
+* **Credentials:** No API keys, passwords, or bearer tokens may ever exist in code or commit history.
+* **Automated Auditing:** Enforce a pre-commit check using tools like `public_export_audit.py` to guarantee a 100% clean PASS receipt before pushing.
+
+---
+
+## 7. Screenshot & Visual Walkthrough Discipline
+
+Developers shouldn't have to guess what an application looks like or how it functions:
+1. **Show the Tool in Action:** Every public project must include CLI execution walkthroughs, ASCII terminal cards, or visual screenshots in the `README.md`.
+2. **Scrubbing Images:** Before publishing any screenshot or terminal capture:
+   * Redact internal IP addresses, local usernames, and MAC addresses.
+   * Use high-contrast color palettes (Gold/Amber, Sky Blue, Forest Green) for low eye strain.
+3. **Architecture Flowcharts:** Use Mermaid diagrams (`flowchart TD`, `sequenceDiagram`) so readers can grasp system boundaries at a glance.
+
+---
+
+## 8. Summary Checklist for AI Agents & Developers
+
+Before considering any task complete:
+- [ ] Rule 16 header and $\ge 25\%$ comment density verified.
+- [ ] 100% unit tests passing with zero external test runner dependencies.
+- [ ] Standard library first ($0.00 spend, zero unnecessary pip dependencies).
+- [ ] Zero PII, private hostnames, or secrets present.
+- [ ] Visual walkthrough and clear quickstart included in `README.md`.
+- [ ] Clean Apache-2.0 or MIT license with upstream attributions.

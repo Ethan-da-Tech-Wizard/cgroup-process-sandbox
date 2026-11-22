@@ -33,6 +33,14 @@ The test suite validates cgroup memory limits, namespace PID 1 process reaping, 
 
 ### Visual Diagnostics Walkthrough
 
+<p align="center">
+  <img src="docs/assets/cgroup_process_execution.svg" alt="Cgroup Process Execution" width="860">
+</p>
+
+<p align="center">
+  <img src="docs/assets/cgroup_enforcement_telemetry.svg" alt="Cgroup Memory Cap Breach & Containment" width="860">
+</p>
+
 ```text
 ┌────────────────────────────────────────────────────────────────────────────┐
 │ $ bash scripts/ethan_capped_run.sh python3 -c "print('sandboxed')"         │
@@ -48,7 +56,9 @@ The test suite validates cgroup memory limits, namespace PID 1 process reaping, 
 
 ## Engineering Standards & Magi Bible
 
-All scripts, resource governance wrappers, and documentation follow the **[Magi Bible: Engineering Foundations & Safety Standards for AI Coding](MAGI_BIBLE.md)**:
+All scripts, resource governance wrappers, and documentation follow the **[Magi Bible: Engineering Foundations & Safety Standards for AI Coding](MAGI_BIBLE.md)** and **[MAGI_LOOK_HERE.md](MAGI_LOOK_HERE.md)**:
+- **[MAGI_LOOK_HERE.md](MAGI_LOOK_HERE.md)**: Universal contributor & AI agent onboarding guide, visual walkthrough requirements, zero-PII validation rules.
+- **[MAGI_BIBLE.md](MAGI_BIBLE.md)**: Core engineering foundations, multi-seat governance, and verification checklists.
 - **Rule 16 Commenting Invariant:** Code contains comprehensive structural headers and inline rationale.
 - **Fail-Closed Security:** Refuses unisolated execution by default if kernel namespaces fail; requires explicit opt-in for host mode.
 - **Zero Secrets & Leak-Scrubbed:** Free of private tokens, paths, or personal hostnames.
