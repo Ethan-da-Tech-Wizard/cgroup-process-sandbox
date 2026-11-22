@@ -37,6 +37,18 @@ RUNNER = Path(__file__).resolve().parent / "ethan_capped_run.sh"
 
 # Absolute path to the host memory safety setup script
 SETUP = Path(__file__).resolve().parent / "ethan_memory_safety_setup.sh"
+def _namespaces_supported():
+    try:
+        r = subprocess.run(
+            ["unshare", "--user", "--map-root-user", "--pid", "--fork", "--net", "--mount-proc", "true"],
+            capture_output=True,
+        )
+        return r.returncode == 0
+    except Exception:
+        return False
+
+NAMESPACES_AVAILABLE = _namespaces_supported()
+
 
 
 def capped(*command, cap="300M"):
@@ -76,6 +88,7 @@ class CappedRunTests(unittest.TestCase):
     Test cases asserting the behavioral guarantees of the sandbox runner and setup script.
     """
 
+    @unittest.skipUnless(NAMESPACES_AVAILABLE, "Kernel namespaces unavailable in container environment")
     def test_runaway_is_killed_at_the_cap_and_nothing_else(self):
         """
         Verify that a process allocating memory indefinitely is killed when reaching ETHAN_CAP.
@@ -90,6 +103,7 @@ class CappedRunTests(unittest.TestCase):
         # Verify the process terminated via SIGKILL (exit code 137 in bash or -9 in Python)
         self.assertIn(result.returncode, (137, -9))
 
+    @unittest.skipUnless(NAMESPACES_AVAILABLE, "Kernel namespaces unavailable in container environment")
     def test_normal_command_runs_with_a_raised_oom_score_and_keeps_its_exit_code(self):
         """
         Verify that a normal command runs with /proc/self/oom_score_adj set to 500
@@ -110,6 +124,7 @@ class CappedRunTests(unittest.TestCase):
             7,
         )
 
+    @unittest.skipUnless(NAMESPACES_AVAILABLE, "Kernel namespaces unavailable in container environment")
     def test_command_runs_in_its_own_pid_namespace_under_a_reaping_pid_one_by_default(self):
         """
         Verify that the user command executes inside a private PID namespace where its
@@ -132,6 +147,7 @@ class CappedRunTests(unittest.TestCase):
         # The command's own PID must be greater than 1
         self.assertGreater(int(pid), 1)
 
+    @unittest.skipUnless(NAMESPACES_AVAILABLE, "Kernel namespaces unavailable in container environment")
     def test_orphaned_grandchildren_are_reaped_not_left_defunct(self):
         """
         Verify that orphaned grandchild background processes are reaped by PID 1
@@ -148,6 +164,7 @@ class CappedRunTests(unittest.TestCase):
         # Zombie count in ps output must be exactly 0
         self.assertEqual(result.stdout.strip(), "0", result.stderr)
 
+    @unittest.skipUnless(NAMESPACES_AVAILABLE, "Kernel namespaces unavailable in container environment")
     def test_broadcast_signal_cannot_reach_real_processes(self):
         """
         Verify that broadcast process signaling (such as killpg(1, 0)) cannot see or
@@ -182,6 +199,7 @@ class CappedRunTests(unittest.TestCase):
         # Verify announcement was emitted to stderr
         self.assertIn("ETHAN_HOST=1", result.stderr)
 
+    @unittest.skipUnless(NAMESPACES_AVAILABLE, "Kernel namespaces unavailable in container environment")
     def test_sandbox_home_is_not_the_real_home(self):
         """
         Verify that the sandbox isolates HOME by generating an ephemeral directory
@@ -195,6 +213,7 @@ class CappedRunTests(unittest.TestCase):
             result.stdout,
         )
 
+    @unittest.skipUnless(NAMESPACES_AVAILABLE, "Kernel namespaces unavailable in container environment")
     def test_only_the_configured_number_of_runs_execute_at_once(self):
         """
         Verify that flock concurrency limiting restricts parallel executions to ETHAN_SLOTS.
@@ -239,6 +258,7 @@ class CappedRunTests(unittest.TestCase):
         self.assertEqual((second.returncode, second.stdout.strip()), (0, "ran"), second.stderr)
         self.assertGreaterEqual(waited, 3, "the second run must wait for the first slot to free")
 
+    @unittest.skipUnless(NAMESPACES_AVAILABLE, "Kernel namespaces unavailable in container environment")
     def test_slots_can_be_switched_off(self):
         """
         Verify that setting ETHAN_SLOTS=0 disables concurrency slot checks entirely.
@@ -253,6 +273,7 @@ class CappedRunTests(unittest.TestCase):
         )
         self.assertEqual((result.returncode, result.stdout.strip()), (0, "ok"), result.stderr)
 
+    @unittest.skipUnless(NAMESPACES_AVAILABLE, "Kernel namespaces unavailable in container environment")
     def test_unwritable_slot_dir_falls_back_to_tmp_instead_of_hanging(self):
         """
         Verify that an unwritable slot directory automatically falls back to /tmp
@@ -273,6 +294,7 @@ class CappedRunTests(unittest.TestCase):
         self.assertEqual((result.returncode, result.stdout.strip()), (0, "fallback-ok"), result.stderr)
         self.assertNotIn("all 2 run slots busy", result.stderr)
 
+    @unittest.skipUnless(NAMESPACES_AVAILABLE, "Kernel namespaces unavailable in container environment")
     def test_stderr_of_the_command_is_not_swallowed(self):
         """
         Verify that stderr output from the target command is preserved and forwarded.
